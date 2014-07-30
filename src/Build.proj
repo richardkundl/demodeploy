@@ -1,0 +1,22 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         DefaultTargets="Compile">
+  <PropertyGroup>
+    <Configuration>Debug</Configuration>
+    <Platform>AnyCPU</Platform>
+    <DefineSolutionProperties>false</DefineSolutionProperties>
+ 
+    <!-- General Paths -->
+    <RootPath>$(MSBuildProjectDirectory)</RootPath>
+    <SrcPath>$(RootPath)</SrcPath>
+    <ReportsPath>$(RootPath)\reports</ReportsPath>
+    <ToolsPath>$(RootPath)\tools</ToolsPath>
+    <Packages>$(SrcPath)\packages</Packages>
+  </PropertyGroup>
+  
+  <Target Name="Compile">
+    <Message Importance="high" Text="Compiling projects"/>
+    <MSBuild Projects="$(SrcPath)\demodeploy\demodeploy.csproj"
+             Properties="Configuration=$(Configuration);Platform=$(Platform)"
+             BuildInParallel="true" />    
+  </Target>
+</Project>
