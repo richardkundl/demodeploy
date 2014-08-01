@@ -45,10 +45,14 @@
     <MakeDir Directories = "$(REPORTS_PATH);$(REPORTS_PATH)\mspec;$(REPORTS_PATH)\coverage" />
   </Target>
 
-    <!-- Clean packages files -->
+  <!-- Clean packages files -->
   <Target Name="CleanPackages">
     <Message Importance="high" Text="Cleaning NuGet packages files"/>
     <RemoveDir Directories="$(PACKAGES_PATH)" Condition="Exists('$(PACKAGES_PATH)')" />
+  </Target>
+
+  <!-- Clean Everything -->
+  <Target Name="NewBorn" DependsOnTargets="Clean;CleanReports;CleanPackages">
   </Target>
   
   <!-- Load NuGet packages target -->
