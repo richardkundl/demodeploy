@@ -9,17 +9,21 @@
 	<!-- Settings -->
 	<TESTS_RUN Condition="$(RUN_TESTS) == ''">false</TESTS_RUN>
 	<TESTS_CATEGORY></TESTS_CATEGORY>
-	
+	<!-- Tests are succesfull? 1 = fail | 0 = ok -->
+	<TESTS_SUCCESS>1</TESTS_SUCCESS>
 	
     <!-- General paths -->
     <ROOT_PATH>$(MSBuildProjectDirectory)\..</ROOT_PATH>
     <SRC_PATH>$(ROOT_PATH)\src</SRC_PATH>
     <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
     <PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>
-	<MSTEST_RUNNER_PATH>&quot;$(VS120COMNTOOLS)\..\Ide\MSTest.exe&quot;</MSTEST_RUNNER_PATH>
+	
+	<MSTEST_RUNNER_PATH>&quot;$(VS120COMNTOOLS)..\Ide\MSTest.exe&quot;</MSTEST_RUNNER_PATH>
   </PropertyGroup>
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
+	<TEST_PROJECTS Include="$(SRC_PATH)\demodeploy.Tests\demodeploy.Tests.csproj" />
+	<TEST_ASSEMBLIES Include="$(SRC_PATH)\**\bin\$(CONFIGURATION)\*.Tests.dll" />
 	<NUGET_CONFIGS Include="$(MSBuildStartupDirectory)\**\packages.config" />
   </ItemGroup>
   
@@ -33,8 +37,10 @@
   
   <!-- Run tests target -->
   <Target Name="Tests" DependsOnTargets="Compile">
-	<Message Importance="high" Text="$(MSTEST_RUNNER_PATH)" />
-	<Exec Command="$(MSTEST_RUNNER_PATH) /?" />
+	<Message Importance="high" Text="Running test from these categories: $(TESTS_CATEGORY)" />
+	<Exec Command="$(MSTEST_RUNNER_PATH) @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ')" >
+	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
+	</Exec>
   </Target>
   
   <!-- Clean projects target -->
