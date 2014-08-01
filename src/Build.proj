@@ -60,6 +60,7 @@
 	
 	<!-- Delete and create new report dirs -->
     <RemoveDir Directories="$(REPORTS_PATH)" Condition="Exists('$(REPORTS_PATH)')" />
+	<RemoveDir Directories="$(SRC_PATH)\TestResults" Condition="Exists('$(SRC_PATH)\TestResults')" />
     <MakeDir Directories = "$(REPORTS_PATH);$(REPORTS_PATH)\mspec;$(REPORTS_PATH)\coverage" />
   </Target>
 
