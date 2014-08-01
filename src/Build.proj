@@ -10,10 +10,11 @@
     <ROOT_PATH>$(MSBuildProjectDirectory)\..</ROOT_PATH>
     <SRC_PATH>$(ROOT_PATH)\src</SRC_PATH>
     <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
-    <PACKAGES>$(SRC_PATH)\packages</PACKAGES>	
+    <PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>	
   </PropertyGroup>
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
+	<NUGET_CONFIGS Include="$(MSBuildStartupDirectory)\**\packages.config" />
   </ItemGroup>
   
   <!-- Compile target --> 
@@ -43,5 +44,17 @@
     <RemoveDir Directories="$(REPORTS_PATH)" Condition="Exists('$(REPORTS_PATH)')" />
     <MakeDir Directories = "$(REPORTS_PATH);$(REPORTS_PATH)\mspec;$(REPORTS_PATH)\coverage" />
   </Target>
-    
+
+    <!-- Clean packages files -->
+  <Target Name="CleanPackages">
+    <Message Importance="high" Text="Cleaning NuGet packages files"/>
+    <RemoveDir Directories="$(PACKAGES_PATH)" Condition="Exists('$(PACKAGES_PATH)')" />
+  </Target>
+  
+  <!-- Load NuGet packages target -->
+  <Target Name="LoadNuGetPackages">
+    <Message Importance="high" Text="Retrieving packages for %(NUGET_CONFIGS.Identity)" />
+    <Exec Command="&quot;$(SRC_PATH)\.nuget\nuget&quot; install &quot;%(NUGET_CONFIGS.Identity)&quot; -o &quot;$(PACKAGES_PATH)&quot;" />
+  </Target>	
+	
 </Project>
