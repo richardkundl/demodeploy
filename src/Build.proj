@@ -1,45 +1,47 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
          DefaultTargets="Compile">
   <PropertyGroup>
-    <Platform>AnyCPU</Platform>
-    <DefineSolutionProperties>false</DefineSolutionProperties>
+    <!-- Configurations -->
+	<CONFIGURATION Condition="$(CONFIGURATION) == ''">release</CONFIGURATION>
+    <PLATFORM>AnyCPU</PLATFORM>
+    <DEFINE_SOLUTION_PROPERTIES>false</DEFINE_SOLUTION_PROPERTIES>
  
     <!-- General paths -->
-    <ROOTPATH>..\$(MSBuildProjectDirectory)</ROOTPATH>
-    <SRCPATH>$(RootPath)\src</SRCPATH>
-    <REPORTSPATH>$(MSBuildProjectDirectory)\results</REPORTSPATH>
-    <PACKAGES>$(SRCPATH)\packages</PACKAGES>
-	
-	<!-- Configurations -->
-	<CONFIGURATION Condition="$(CONFIGURATION) == ''">release</CONFIGURATION>
+    <ROOT_PATH>$(MSBuildProjectDirectory)\..</ROOT_PATH>
+    <SRC_PATH>$(ROOT_PATH)\src</SRC_PATH>
+    <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
+    <PACKAGES>$(SRC_PATH)\packages</PACKAGES>	
   </PropertyGroup>
   <ItemGroup>
-    <PROJECTFILES Include="**\*.csproj" />
+    <PROJECT_FILES Include="**\*.csproj" />
   </ItemGroup>
   
   <!-- Compile target --> 
   <Target Name="Compile">
     <Message Importance="high" Text="Compiling projects"/>
-    <MSBuild Projects="@(PROJECTFILES)"
-             Properties="Configuration=$(Configuration);Platform=$(Platform)"
+    <MSBuild Projects="@(PROJECT_FILES)"
+             Properties="Configuration=$(CONFIGURATION);Platform=$(PLATFORM)"
              BuildInParallel="true" />    
   </Target>
   
   <!-- Clean projects target -->
   <Target Name="Clean">
     <Message Importance="high" Text="Cleaning projects"/>
+	
     <!-- Clean the source code projects -->
-    <MSBuild Projects="@(PROJECTFILES)"
+    <MSBuild Projects="@(PROJECT_FILES)"
              ContinueOnError="false"
              Targets="Clean"
-             Properties="Configuration=$(Configuration)" />
+             Properties="Configuration=$(CONFIGURATION)" />
   </Target>
   
   <!-- Clean reports -->
   <Target Name="CleanReports">
     <Message Importance="high" Text="Cleaning reports"/>
-    <RemoveDir Directories="$(REPORTSPATH)" Condition="Exists('$(REPORTSPATH)')" />
-    <MakeDir Directories = "$(REPORTSPATH);$(REPORTSPATH)\mspec;$(REPORTSPATH)\coverage" />
+	
+	<!-- Delete and create new report dirs -->
+    <RemoveDir Directories="$(REPORTS_PATH)" Condition="Exists('$(REPORTS_PATH)')" />
+    <MakeDir Directories = "$(REPORTS_PATH);$(REPORTS_PATH)\mspec;$(REPORTS_PATH)\coverage" />
   </Target>
     
 </Project>
