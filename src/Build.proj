@@ -5,12 +5,18 @@
 	<CONFIGURATION Condition="$(CONFIGURATION) == ''">release</CONFIGURATION>
     <PLATFORM>AnyCPU</PLATFORM>
     <DEFINE_SOLUTION_PROPERTIES>false</DEFINE_SOLUTION_PROPERTIES>
- 
+	
+	<!-- Settings -->
+	<TESTS_RUN Condition="$(RUN_TESTS) == ''">false</TESTS_RUN>
+	<TESTS_CATEGORY></TESTS_CATEGORY>
+	
+	
     <!-- General paths -->
     <ROOT_PATH>$(MSBuildProjectDirectory)\..</ROOT_PATH>
     <SRC_PATH>$(ROOT_PATH)\src</SRC_PATH>
     <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
-    <PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>	
+    <PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>
+	<MSTEST_RUNNER_PATH>&quot;$(VS120COMNTOOLS)\..\Ide\MSTest.exe&quot;</MSTEST_RUNNER_PATH>
   </PropertyGroup>
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
@@ -23,6 +29,12 @@
     <MSBuild Projects="@(PROJECT_FILES)"
              Properties="Configuration=$(CONFIGURATION);Platform=$(PLATFORM)"
              BuildInParallel="true" />    
+  </Target>
+  
+  <!-- Run tests target -->
+  <Target Name="Tests" DependsOnTargets="Compile">
+	<Message Importance="high" Text="$(MSTEST_RUNNER_PATH)" />
+	<Exec Command="$(MSTEST_RUNNER_PATH) /?" />
   </Target>
   
   <!-- Clean projects target -->
