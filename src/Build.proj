@@ -17,8 +17,8 @@
     <SRC_PATH>$(ROOT_PATH)\src</SRC_PATH>
     <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
     <PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>
-	
 	<MSTEST_RUNNER_PATH>&quot;$(VS120COMNTOOLS)..\Ide\MSTest.exe&quot;</MSTEST_RUNNER_PATH>
+	<MSTEST_RESULT_PATH>$(REPORTS_PATH)\results.trx</MSTEST_RESULT_PATH>
   </PropertyGroup>
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
@@ -38,7 +38,7 @@
   <!-- Run tests target -->
   <Target Name="Tests" DependsOnTargets="Compile">
 	<Message Importance="high" Text="Running test from these categories: $(TESTS_CATEGORY)" />
-	<Exec Command="$(MSTEST_RUNNER_PATH) @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ')" >
+	<Exec Command="$(MSTEST_RUNNER_PATH) @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;" >
 	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
 	</Exec>
   </Target>
@@ -61,7 +61,7 @@
 	<!-- Delete and create new report dirs -->
     <RemoveDir Directories="$(REPORTS_PATH)" Condition="Exists('$(REPORTS_PATH)')" />
 	<RemoveDir Directories="$(SRC_PATH)\TestResults" Condition="Exists('$(SRC_PATH)\TestResults')" />
-    <MakeDir Directories = "$(REPORTS_PATH);$(REPORTS_PATH)\mspec;$(REPORTS_PATH)\coverage" />
+    <MakeDir Directories = "$(REPORTS_PATH);$(REPORTS_PATH)\coverage" />
   </Target>
 
   <!-- Clean packages files -->
