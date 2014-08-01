@@ -8,15 +8,38 @@
     <!-- General Paths -->
     <RootPath>$(MSBuildProjectDirectory)</RootPath>
     <SrcPath>$(RootPath)</SrcPath>
-    <ReportsPath>$(RootPath)\reports</ReportsPath>
-    <ToolsPath>$(RootPath)\tools</ToolsPath>
+    <ReportsPath>..\results</ReportsPath>
+     <!--ToolsPath>$(RootPath)\tools</ToolsPath-->
     <Packages>$(SrcPath)\packages</Packages>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectFiles Include="**\*.csproj" />
+  </ItemGroup>
   
+  <!-- Compile target --> 
   <Target Name="Compile">
     <Message Importance="high" Text="Compiling projects"/>
-    <MSBuild Projects="$(SrcPath)\demodeploy\demodeploy.csproj"
+    <MSBuild Projects="@(ProjectFiles)"
              Properties="Configuration=$(Configuration);Platform=$(Platform)"
              BuildInParallel="true" />    
   </Target>
+  
+  <!-- Clean projects target -->
+
+  <Target Name="Clean">
+    <Message Importance="high" Text="Cleaning projects"/>
+    <!-- Clean the source code projects -->
+    <MSBuild Projects="@(ProjectFiles)"
+             ContinueOnError="false"
+             Targets="Clean"
+             Properties="Configuration=$(Configuration)" />
+  </Target>
+  
+  <!-- Clean reports -->
+    <Target Name="CleanReports">
+    <Message Importance="high" Text="Cleaning reports"/>
+    <RemoveDir Directories="$(ReportsPath)" Condition="Exists('$(ReportsPath)')" />
+    <MakeDir Directories = "$(ReportsPath);$(ReportsPath)\mspec;$(ReportsPath)\coverage" />
+  </Target>
+    
 </Project>
