@@ -1,5 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
          DefaultTargets="Compile">
+  <Import Project=".msbuild\MSBuild.ExtensionPack.tasks"/>
+
   <PropertyGroup>
     <!-- Configurations -->
 	<CONFIGURATION Condition="$(CONFIGURATION) == ''">release</CONFIGURATION>
