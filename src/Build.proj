@@ -16,9 +16,14 @@
     <ROOT_PATH>$(MSBuildProjectDirectory)\..</ROOT_PATH>
     <SRC_PATH>$(ROOT_PATH)\src</SRC_PATH>
     <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
-    <PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>
+	<COVERAGE_PATH>$(REPORTS_PATH)\coverage</COVERAGE_PATH>
+	<PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>
 	<MSTEST_RUNNER_PATH>&quot;$(VS120COMNTOOLS)..\Ide\MSTest.exe&quot;</MSTEST_RUNNER_PATH>
 	<MSTEST_RESULT_PATH>$(REPORTS_PATH)\results.trx</MSTEST_RESULT_PATH>
+	<OPENCOVER_RUNNER_PATH>$(PACKAGES_PATH)\OpenCover.4.5.2506\OpenCover.Console.exe</OPENCOVER_RUNNER_PATH>
+	<OPENCOVER_RESULT_PATH>$(REPORTS_PATH)\coverage-output.xml</OPENCOVER_RESULT_PATH>
+   	<REPORTGENERATOR_RUNNER_PATH>$(PACKAGES_PATH)\ReportGenerator.1.9.1.0\ReportGenerator.exe</REPORTGENERATOR_RUNNER_PATH>
+	<REPORTGENERATOR_RESULT_PATH>$(REPORTS_PATH)\coverage-summary.xml</REPORTGENERATOR_RESULT_PATH>
   </PropertyGroup>
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
@@ -61,7 +66,7 @@
 	<!-- Delete and create new report dirs -->
     <RemoveDir Directories="$(REPORTS_PATH)" Condition="Exists('$(REPORTS_PATH)')" />
 	<RemoveDir Directories="$(SRC_PATH)\TestResults" Condition="Exists('$(SRC_PATH)\TestResults')" />
-    <MakeDir Directories = "$(REPORTS_PATH);$(REPORTS_PATH)\coverage" />
+    <MakeDir Directories = "$(REPORTS_PATH);$(COVERAGE_PATH)" />
   </Target>
 
   <!-- Clean packages files -->
