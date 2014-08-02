@@ -23,14 +23,12 @@
 	<OPENCOVER_RUNNER_PATH>$(PACKAGES_PATH)\OpenCover.4.5.2506\OpenCover.Console.exe</OPENCOVER_RUNNER_PATH>
 	<OPENCOVER_RESULT_PATH>$(REPORTS_PATH)\coverage-output.xml</OPENCOVER_RESULT_PATH>
    	<REPORTGENERATOR_RUNNER_PATH>$(PACKAGES_PATH)\ReportGenerator.1.9.1.0\ReportGenerator.exe</REPORTGENERATOR_RUNNER_PATH>
-	<REPORTGENERATOR_RESULT_PATH>$(REPORTS_PATH)\coverage-summary.xml</REPORTGENERATOR_RESULT_PATH>
+	<REPORTGENERATOR_RESULT_PATH>$(COVERAGE_PATH)</REPORTGENERATOR_RESULT_PATH>
 	
 	<!-- Commands -->
-	<!-- Code coverage command -->
-	<OPENCOVER_COMMAND>&quot;$(OPENCOVER_RUNNER_PATH)&quot; -register:user -target:&quot;$(MSTEST_RUNNER_PATH)&quot; -targetargs:&quot;@(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:$(TESTS_CATEGORY) /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;&quot; -output:&quot;$(OPENCOVER_RESULT_PATH)&quot;
-	</OPENCOVER_COMMAND>
-	<!-- MStest command-->
+	<OPENCOVER_COMMAND>&quot;$(OPENCOVER_RUNNER_PATH)&quot; -register:user -target:&quot;$(MSTEST_RUNNER_PATH)&quot; -targetargs:&quot;@(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:$(TESTS_CATEGORY) /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;&quot; -output:&quot;$(OPENCOVER_RESULT_PATH)&quot;</OPENCOVER_COMMAND>
 	<MSTEST_COMMAND>&quot;$(MSTEST_RUNNER_PATH)&quot; @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:&quot;$(TESTS_CATEGORY)&quot; /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;</MSTEST_COMMAND>
+    <REPORTGENERATOR_COMMAND>&quot;$(REPORTGENERATOR_RUNNER_PATH)&quot; -reports:&quot;$(OPENCOVER_RESULT_PATH)&quot; -targetdir:&quot;$(REPORTGENERATOR_RESULT_PATH)&quot; -reporttypes:Html,HtmlSummary</REPORTGENERATOR_COMMAND>
   </PropertyGroup>
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
@@ -60,6 +58,9 @@
     <Message Importance="high" Text="Running opencover test from these categories: $(TESTS_CATEGORY)" />
 	<Exec Command="$(OPENCOVER_COMMAND)">
 	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
+	</Exec>
+	<Message Importance="high" Text="Generate coverage result: $(REPORTGENERATOR_RESULT_PATH)" />
+	<Exec Command="$(REPORTGENERATOR_COMMAND)">
 	</Exec>
   </Target>
   
