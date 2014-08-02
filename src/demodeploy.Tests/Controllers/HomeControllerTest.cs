@@ -13,6 +13,7 @@ namespace demodeploy.Tests.Controllers
 	public class HomeControllerTest
 	{
 		[TestMethod]
+        [TestCategory("RegressionTest")]
 		public void Index()
 		{
 			// Arrange
@@ -26,6 +27,7 @@ namespace demodeploy.Tests.Controllers
 		}
 
 		[TestMethod]
+        [TestCategory("RegressionTest")]
 		public void About()
 		{
 			// Arrange
@@ -39,6 +41,7 @@ namespace demodeploy.Tests.Controllers
 		}
 
 		[TestMethod]
+        [TestCategory("RegressionTest")]
 		public void Contact()
 		{
 			// Arrange

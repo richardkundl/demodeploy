@@ -38,7 +38,7 @@
   <!-- Run tests target -->
   <Target Name="Tests" DependsOnTargets="Compile">
 	<Message Importance="high" Text="Running test from these categories: $(TESTS_CATEGORY)" />
-	<Exec Command="$(MSTEST_RUNNER_PATH) @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;" >
+	<Exec Command="$(MSTEST_RUNNER_PATH) @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:&quot;$(TESTS_CATEGORY)&quot; /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;" >
 	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
 	</Exec>
   </Target>
