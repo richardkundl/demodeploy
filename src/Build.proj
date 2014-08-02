@@ -18,12 +18,16 @@
     <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
 	<COVERAGE_PATH>$(REPORTS_PATH)\coverage</COVERAGE_PATH>
 	<PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>
-	<MSTEST_RUNNER_PATH>&quot;$(VS120COMNTOOLS)..\Ide\MSTest.exe&quot;</MSTEST_RUNNER_PATH>
+	<MSTEST_RUNNER_PATH>$(VS120COMNTOOLS)..\Ide\MSTest.exe</MSTEST_RUNNER_PATH>
 	<MSTEST_RESULT_PATH>$(REPORTS_PATH)\results.trx</MSTEST_RESULT_PATH>
 	<OPENCOVER_RUNNER_PATH>$(PACKAGES_PATH)\OpenCover.4.5.2506\OpenCover.Console.exe</OPENCOVER_RUNNER_PATH>
 	<OPENCOVER_RESULT_PATH>$(REPORTS_PATH)\coverage-output.xml</OPENCOVER_RESULT_PATH>
    	<REPORTGENERATOR_RUNNER_PATH>$(PACKAGES_PATH)\ReportGenerator.1.9.1.0\ReportGenerator.exe</REPORTGENERATOR_RUNNER_PATH>
 	<REPORTGENERATOR_RESULT_PATH>$(REPORTS_PATH)\coverage-summary.xml</REPORTGENERATOR_RESULT_PATH>
+	
+	<!-- Code coverage settings -->
+	<OPENCOVER_COMMAND>&quot;$(OPENCOVER_RUNNER_PATH)&quot; -register:user -target:&quot;$(MSTEST_RUNNER_PATH)&quot; -targetargs:&quot;@(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:$(TESTS_CATEGORY) /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;&quot; -output:&quot;$(OPENCOVER_RESULT_PATH)&quot;
+	</OPENCOVER_COMMAND>
   </PropertyGroup>
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
@@ -33,17 +37,25 @@
   </ItemGroup>
   
   <!-- Compile target --> 
-  <Target Name="Compile">
-    <Message Importance="high" Text="Compiling projects"/>
+  <Target Name="Compile" DependsOnTargets="LoadNuGetPackages">
+    <Message Importance="high" Text="Compiling all projects: @(PROJECT_FILES)"/>
     <MSBuild Projects="@(PROJECT_FILES)"
              Properties="Configuration=$(CONFIGURATION);Platform=$(PLATFORM)"
              BuildInParallel="true" />    
   </Target>
   
-  <!-- Run tests target -->
+  <!-- Run MStest -s target -->
   <Target Name="MsTests" DependsOnTargets="Compile">
-	<Message Importance="high" Text="Running test from these categories: $(TESTS_CATEGORY)" />
-	<Exec Command="$(MSTEST_RUNNER_PATH) @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:&quot;$(TESTS_CATEGORY)&quot; /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;" >
+	<Message Importance="high" Text="Running MsTest from these categories: $(TESTS_CATEGORY)" />
+	<Exec Command="&quot;$(MSTEST_RUNNER_PATH)&quot; @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:&quot;$(TESTS_CATEGORY)&quot; /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;" >
+	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
+	</Exec>
+  </Target>
+  
+  <!-- Run OpenCover based code coverage, then generate report -->
+  <Target Name="CodeCoverage" DependsOnTargets="Compile">
+    <Message Importance="high" Text="Running opencover test from these categories: $(TESTS_CATEGORY)" />
+	<Exec Command="$(OPENCOVER_COMMAND)">
 	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
 	</Exec>
   </Target>
