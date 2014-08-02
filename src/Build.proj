@@ -1,7 +1,5 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
          DefaultTargets="Compile">
-  <Import Project=".msbuild\MSBuild.ExtensionPack.tasks"/>
-
   <PropertyGroup>
     <!-- Configurations -->
 	<CONFIGURATION Condition="$(CONFIGURATION) == ''">release</CONFIGURATION>
@@ -13,6 +11,12 @@
 	<TESTS_CATEGORY></TESTS_CATEGORY>
 	<!-- Tests are succesfull? 1 = fail | 0 = ok -->
 	<TESTS_SUCCESS>1</TESTS_SUCCESS>
+	<!-- Version number settings -->
+	<ASSEMBLY_MAYOR_VERSION>1</ASSEMBLY_MAYOR_VERSION>
+	<ASSEMBLY_MINOR_VERSION>1</ASSEMBLY_MINOR_VERSION>
+	<ASSEMBLY_BUILD_NUMBER Condition="$(ASSEMBLY_BUILD_NUMBER) == ''">1</ASSEMBLY_BUILD_NUMBER>
+	<ASSEMBLY_TIME_VERSION>1</ASSEMBLY_TIME_VERSION>
+	<ASSEMBLY_VERSION>$(ASSEMBLY_MAYOR_VERSION).$(ASSEMBLY_MINOR_VERSION).$(ASSEMBLY_BUILD_NUMBER).$(ASSEMBLY_TIME_VERSION)</ASSEMBLY_VERSION>
 	
     <!-- General paths -->
     <ROOT_PATH>$(MSBuildProjectDirectory)\..</ROOT_PATH>
@@ -32,15 +36,20 @@
 	<MSTEST_COMMAND>&quot;$(MSTEST_RUNNER_PATH)&quot; @(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:&quot;$(TESTS_CATEGORY)&quot; /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;</MSTEST_COMMAND>
     <REPORTGENERATOR_COMMAND>&quot;$(REPORTGENERATOR_RUNNER_PATH)&quot; -reports:&quot;$(OPENCOVER_RESULT_PATH)&quot; -targetdir:&quot;$(REPORTGENERATOR_RESULT_PATH)&quot; -reporttypes:Html,HtmlSummary</REPORTGENERATOR_COMMAND>
   </PropertyGroup>
+
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
+	<ASSEMBLY_INFO_FILES Include="**\AssemblyInfo.cs"/>
 	<TEST_PROJECTS Include="$(SRC_PATH)\demodeploy.Tests\demodeploy.Tests.csproj" />
 	<TEST_ASSEMBLIES Include="$(SRC_PATH)\**\bin\$(CONFIGURATION)\*.Tests.dll" />
 	<NUGET_CONFIGS Include="$(MSBuildStartupDirectory)\**\packages.config" />
   </ItemGroup>
   
+  <!-- Import msbuild extension pack -->
+  <Import Project="$(PACKAGES_PATH)\MSBuild.Extension.Pack.1.5.0\tools\net40\MSBuild.ExtensionPack.VersionNumber.targets"/>
+  
   <!-- Compile target --> 
-  <Target Name="Compile" DependsOnTargets="LoadNuGetPackages">
+  <Target Name="Compile" DependsOnTargets="LoadNuGetPackages;SetAssemblyVersion">
     <Message Importance="high" Text="Compiling all projects: @(PROJECT_FILES)"/>
     <MSBuild Projects="@(PROJECT_FILES)"
              Properties="Configuration=$(CONFIGURATION);Platform=$(PLATFORM)"
@@ -102,5 +111,17 @@
     <Message Importance="high" Text="Retrieving packages for %(NUGET_CONFIGS.Identity)" />
     <Exec Command="&quot;$(SRC_PATH)\.nuget\nuget&quot; install &quot;%(NUGET_CONFIGS.Identity)&quot; -o &quot;$(PACKAGES_PATH)&quot;" />
   </Target>	
-	
+
+  <!-- Set version and assembly information -->
+  <Target Name="SetAssemblyVersion">
+    <Message Importance="high" Text="Set version numer to: $(ASSEMBLY_VERSION)"/>
+    <AssemblyInfo 
+	  AssemblyInfoFiles="@(ASSEMBLY_INFO_FILES)"
+      AssemblyCompany="Acme Co."
+      AssemblyProduct="Demo deploy"
+      AssemblyCopyright="Copyright © 2014 Kundl Richard, All Rights Reserved."
+      ComVisible="false"
+      AssemblyVersion="$(ASSEMBLY_VERSION)"
+      AssemblyFileVersion="$(ASSEMBLY_VERSION)" />
+</Target>
 </Project>
