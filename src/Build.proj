@@ -58,7 +58,7 @@
   </Target>
   
   <!-- Run MStest -s target -->
-  <Target Name="MsTests" DependsOnTargets="Compile">
+  <Target Name="MsTests" >
 	<Message Importance="high" Text="Running MsTest from these categories: $(TESTS_CATEGORY)" />
 	<Exec Command="$(MSTEST_COMMAND)" >
 	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
