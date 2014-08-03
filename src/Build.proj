@@ -11,12 +11,11 @@
 	<TESTS_CATEGORY></TESTS_CATEGORY>
 	<!-- Tests are succesfull? 1 = fail | 0 = ok -->
 	<TESTS_SUCCESS>1</TESTS_SUCCESS>
-	<!-- Version number settings -->
+	<!-- Version number settings (the complete version number in the task) -->
 	<ASSEMBLY_MAYOR_VERSION>1</ASSEMBLY_MAYOR_VERSION>
 	<ASSEMBLY_MINOR_VERSION>1</ASSEMBLY_MINOR_VERSION>
 	<ASSEMBLY_BUILD_NUMBER Condition="$(ASSEMBLY_BUILD_NUMBER) == ''">1</ASSEMBLY_BUILD_NUMBER>
 	<ASSEMBLY_TIME_VERSION>1</ASSEMBLY_TIME_VERSION>
-	<ASSEMBLY_VERSION>$(ASSEMBLY_MAYOR_VERSION).$(ASSEMBLY_MINOR_VERSION).$(ASSEMBLY_BUILD_NUMBER).$(ASSEMBLY_TIME_VERSION)</ASSEMBLY_VERSION>
 	
     <!-- General paths -->
     <ROOT_PATH>$(MSBuildProjectDirectory)\..</ROOT_PATH>
@@ -24,6 +23,7 @@
     <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
 	<COVERAGE_PATH>$(REPORTS_PATH)\coverage</COVERAGE_PATH>
 	<PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>
+	<MSBUILD_EXTENSION_PATH>$(PACKAGES_PATH)\MSBuild.Extension.Pack.1.5.0\tools\net40</MSBUILD_EXTENSION_PATH>
 	<MSTEST_RUNNER_PATH>$(VS120COMNTOOLS)..\Ide\MSTest.exe</MSTEST_RUNNER_PATH>
 	<MSTEST_RESULT_PATH>$(REPORTS_PATH)\results.trx</MSTEST_RESULT_PATH>
 	<OPENCOVER_RUNNER_PATH>$(PACKAGES_PATH)\OpenCover.4.5.2506\OpenCover.Console.exe</OPENCOVER_RUNNER_PATH>
@@ -46,7 +46,8 @@
   </ItemGroup>
   
   <!-- Import msbuild extension pack -->
-  <Import Project="$(PACKAGES_PATH)\MSBuild.Extension.Pack.1.5.0\tools\net40\MSBuild.ExtensionPack.VersionNumber.targets"/>
+  <Import Project="$(MSBUILD_EXTENSION_PATH)\MSBuild.ExtensionPack.VersionNumber.targets"/>
+  <UsingTask AssemblyFile="$(MSBUILD_EXTENSION_PATH)\MSBuild.ExtensionPack.dll" TaskName="MSBuild.ExtensionPack.Framework.DateAndTime"/>
   
   <!-- Compile target --> 
   <Target Name="Compile" DependsOnTargets="LoadNuGetPackages;SetAssemblyVersion">
@@ -111,9 +112,20 @@
     <Message Importance="high" Text="Retrieving packages for %(NUGET_CONFIGS.Identity)" />
     <Exec Command="&quot;$(SRC_PATH)\.nuget\nuget&quot; install &quot;%(NUGET_CONFIGS.Identity)&quot; -o &quot;$(PACKAGES_PATH)&quot;" />
   </Target>	
-
+ 
   <!-- Set version and assembly information -->
   <Target Name="SetAssemblyVersion">
+    <!-- call current date time -->
+    <MSBuild.ExtensionPack.Framework.DateAndTime TaskAction="Get" Format="ddHHmm">
+      <Output TaskParameter="Result" PropertyName="ASSEMBLY_TIME_VERSION"/>
+    </MSBuild.ExtensionPack.Framework.DateAndTime>
+	
+	<!-- generate the version number, it will be local variable, because the global variables can not be task to write  -->
+    <PropertyGroup>
+	  <ASSEMBLY_VERSION>$(ASSEMBLY_MAYOR_VERSION).$(ASSEMBLY_MINOR_VERSION).$(ASSEMBLY_BUILD_NUMBER).$(ASSEMBLY_TIME_VERSION)</ASSEMBLY_VERSION>
+	</PropertyGroup>
+  
+    <!-- set the version number -->
     <Message Importance="high" Text="Set version numer to: $(ASSEMBLY_VERSION)"/>
     <AssemblyInfo 
 	  AssemblyInfoFiles="@(ASSEMBLY_INFO_FILES)"
