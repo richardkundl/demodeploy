@@ -30,6 +30,7 @@
 	<OPENCOVER_RESULT_PATH>$(REPORTS_PATH)\coverage-output.xml</OPENCOVER_RESULT_PATH>
    	<REPORTGENERATOR_RUNNER_PATH>$(PACKAGES_PATH)\ReportGenerator.1.9.1.0\ReportGenerator.exe</REPORTGENERATOR_RUNNER_PATH>
 	<REPORTGENERATOR_RESULT_PATH>$(COVERAGE_PATH)</REPORTGENERATOR_RESULT_PATH>
+	<STYLECOP_RESULT_PATH>$(REPORTS_PATH)\styelcop.xml</STYLECOP_RESULT_PATH>
 	
 	<!-- Commands -->
 	<OPENCOVER_COMMAND>&quot;$(OPENCOVER_RUNNER_PATH)&quot; -register:user -target:&quot;$(MSTEST_RUNNER_PATH)&quot; -targetargs:&quot;@(TEST_ASSEMBLIES->'/testcontainer:&quot;%(FullPath)&quot;', ' ') /category:$(TESTS_CATEGORY) /resultsfile:&quot;$(MSTEST_RESULT_PATH)&quot;&quot; -output:&quot;$(OPENCOVER_RESULT_PATH)&quot;</OPENCOVER_COMMAND>
@@ -58,7 +59,7 @@
   </Target>
   
   <!-- Run MStest -s target -->
-  <Target Name="MsTests" >
+  <Target Name="MsTests">
 	<Message Importance="high" Text="Running MsTest from these categories: $(TESTS_CATEGORY)" />
 	<Exec Command="$(MSTEST_COMMAND)" >
 	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
@@ -66,7 +67,7 @@
   </Target>
   
   <!-- Run OpenCover based code coverage, then generate report -->
-  <Target Name="CodeCoverage" DependsOnTargets="Compile">
+  <Target Name="CodeCoverage">
     <Message Importance="high" Text="Running opencover test from these categories: $(TESTS_CATEGORY)" />
 	<Exec Command="$(OPENCOVER_COMMAND)">
 	  <Output TaskParameter="ExitCode" PropertyName="TESTS_SUCCESS"/>
@@ -76,22 +77,18 @@
 	</Exec>
   </Target>
   
-  <!-- Clean projects target -->
+  <!-- Clean the source code projects -->
   <Target Name="Clean">
     <Message Importance="high" Text="Cleaning projects"/>
-	
-    <!-- Clean the source code projects -->
     <MSBuild Projects="@(PROJECT_FILES)"
              ContinueOnError="false"
              Targets="Clean"
              Properties="Configuration=$(CONFIGURATION)" />
   </Target>
   
-  <!-- Clean reports -->
+  <!-- Clean and create new report dirs -->
   <Target Name="CleanReports">
     <Message Importance="high" Text="Cleaning reports"/>
-	
-	<!-- Delete and create new report dirs -->
     <RemoveDir Directories="$(REPORTS_PATH)" Condition="Exists('$(REPORTS_PATH)')" />
 	<RemoveDir Directories="$(SRC_PATH)\TestResults" Condition="Exists('$(SRC_PATH)\TestResults')" />
     <MakeDir Directories = "$(REPORTS_PATH);$(COVERAGE_PATH)" />
