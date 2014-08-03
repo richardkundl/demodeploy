@@ -16,6 +16,9 @@
 	<ASSEMBLY_MINOR_VERSION>1</ASSEMBLY_MINOR_VERSION>
 	<ASSEMBLY_BUILD_NUMBER Condition="$(ASSEMBLY_BUILD_NUMBER) == ''">1</ASSEMBLY_BUILD_NUMBER>
 	<ASSEMBLY_TIME_VERSION>1</ASSEMBLY_TIME_VERSION>
+    <!-- Negative number equal infinity -->
+    <STYLECOP_MAX_VIOLATION_COUNT>-1</STYLECOP_MAX_VIOLATION_COUNT>
+    <STYLECOP_VIOLATION_COUNT></STYLECOP_VIOLATION_COUNT>
 	
     <!-- General paths -->
     <ROOT_PATH>$(MSBuildProjectDirectory)\..</ROOT_PATH>
@@ -30,6 +33,7 @@
 	<OPENCOVER_RESULT_PATH>$(REPORTS_PATH)\coverage-output.xml</OPENCOVER_RESULT_PATH>
    	<REPORTGENERATOR_RUNNER_PATH>$(PACKAGES_PATH)\ReportGenerator.1.9.1.0\ReportGenerator.exe</REPORTGENERATOR_RUNNER_PATH>
 	<REPORTGENERATOR_RESULT_PATH>$(COVERAGE_PATH)</REPORTGENERATOR_RESULT_PATH>
+	<STYLECOP_PATH>$(PACKAGES_PATH)\StyleCop.MSBuild.4.7.49.0</STYLECOP_PATH>
 	<STYLECOP_RESULT_PATH>$(REPORTS_PATH)\styelcop.xml</STYLECOP_RESULT_PATH>
 	
 	<!-- Commands -->
@@ -44,14 +48,17 @@
 	<TEST_PROJECTS Include="$(SRC_PATH)\demodeploy.Tests\demodeploy.Tests.csproj" />
 	<TEST_ASSEMBLIES Include="$(SRC_PATH)\**\bin\$(CONFIGURATION)\*.Tests.dll" />
 	<NUGET_CONFIGS Include="$(MSBuildStartupDirectory)\**\packages.config" />
+	<STYLECOP_FILES Include="$(SRC_PATH)\**\*.cs" Exclude="$(SRC_PATH)\**\*.designer.cs;$(SRC_PATH)\**Test*\**\*.*;" />
   </ItemGroup>
   
   <!-- Import msbuild extension pack -->
   <Import Project="$(MSBUILD_EXTENSION_PATH)\MSBuild.ExtensionPack.VersionNumber.targets"/>
   <UsingTask AssemblyFile="$(MSBUILD_EXTENSION_PATH)\MSBuild.ExtensionPack.dll" TaskName="MSBuild.ExtensionPack.Framework.DateAndTime"/>
-  
+  <!-- Import stylecop -->
+  <Import Project="$(STYLECOP_PATH)\build\StyleCop.MSBuild.Targets"/>
+	
   <!-- Compile target --> 
-  <Target Name="Compile" DependsOnTargets="LoadNuGetPackages;SetAssemblyVersion">
+  <Target Name="Compile" DependsOnTargets="LoadNuGetPackages;SetAssemblyVersion;ValidateStylecop">
     <Message Importance="high" Text="Compiling all projects: @(PROJECT_FILES)"/>
     <MSBuild Projects="@(PROJECT_FILES)"
              Properties="Configuration=$(CONFIGURATION);Platform=$(PLATFORM)"
@@ -132,5 +139,23 @@
       ComVisible="false"
       AssemblyVersion="$(ASSEMBLY_VERSION)"
       AssemblyFileVersion="$(ASSEMBLY_VERSION)" />
-</Target>
+  </Target>
+
+  <!-- Validate stylecop errors -->
+  <Target Name="ValidateStylecop">
+    <Message Importance="high" Text="Running stylcop validation" />
+    <StyleCopTask
+      ProjectFullPath="$(SRC_PATH)"
+      SourceFiles="@(STYLECOP_FILES)"
+      ForceFullAnalysis="true"
+      CacheResults="false"
+      OverrideSettingsFile="&quot;$(SRC_PATH))\Settings.StyleCop&quot;"
+      OutputFile="$(STYLECOP_RESULT_PATH)"
+      TreatErrorsAsWarnings="true"
+      MaxViolationCount="$(STYLECOP_MAX_VIOLATION_COUNT)">
+      <Output TaskParameter="ViolationCount" PropertyName="STYLECOP_VIOLATION_COUNT" />
+    </StyleCopTask>
+    <Message Importance="high" Text="Finished stylecop validation: $(STYLECOP_VIOLATION_COUNT) errors found."/>
+  </Target>
+  
 </Project>
