@@ -52,10 +52,10 @@
   </ItemGroup>
   
   <!-- Import msbuild extension pack -->
-  <Import Project="$(MSBUILD_EXTENSION_PATH)\MSBuild.ExtensionPack.VersionNumber.targets"/>
+  <Import Condition="exists('$(MSBUILD_EXTENSION_PATH)\MSBuild.ExtensionPack.VersionNumber.targets')" Project="$(MSBUILD_EXTENSION_PATH)\MSBuild.ExtensionPack.VersionNumber.targets"/>
   <UsingTask AssemblyFile="$(MSBUILD_EXTENSION_PATH)\MSBuild.ExtensionPack.dll" TaskName="MSBuild.ExtensionPack.Framework.DateAndTime"/>
   <!-- Import stylecop -->
-  <Import Project="$(STYLECOP_PATH)\build\StyleCop.MSBuild.Targets"/>
+  <Import Condition="exists('$(STYLECOP_PATH)\build\StyleCop.MSBuild.Targets')" Project="$(STYLECOP_PATH)\build\StyleCop.MSBuild.Targets"/>
 	
   <!-- Compile target --> 
   <Target Name="Compile" DependsOnTargets="LoadNuGetPackages;SetAssemblyVersion;ValidateStylecop">
