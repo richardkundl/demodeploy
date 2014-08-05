@@ -18,6 +18,7 @@ demodeploy
 
 **Optional**
 - [ ] **Compress and upload/email results data**
+- [x] **Validate MVC Views**
 
 
 **How to run?**
