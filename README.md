@@ -19,3 +19,6 @@ demodeploy
 **Optional**
 - [ ] **Compress and upload/email results data**
 
+
+**How to run?**
+Go to the root folder, start a command line and use this "rundmc.cmd debug 12".  "12" is the version number.
