@@ -120,7 +120,7 @@
   <!-- Set version and assembly information -->
   <Target Name="SetAssemblyVersion">
     <!-- call current date time -->
-    <MSBuild.ExtensionPack.Framework.DateAndTime TaskAction="Get" Format="ddHHmm">
+    <MSBuild.ExtensionPack.Framework.DateAndTime TaskAction="Get" Format="HHmm">
       <Output TaskParameter="Result" PropertyName="ASSEMBLY_TIME_VERSION"/>
     </MSBuild.ExtensionPack.Framework.DateAndTime>
 	
