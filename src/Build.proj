@@ -5,6 +5,8 @@
 	<CONFIGURATION Condition="$(CONFIGURATION) == ''">release</CONFIGURATION>
     <PLATFORM>AnyCPU</PLATFORM>
     <DEFINE_SOLUTION_PROPERTIES>false</DEFINE_SOLUTION_PROPERTIES>
+	<!-- Validate MVC build views -->
+	<VALIDATE_VIEWS>false</VALIDATE_VIEWS>
 	
 	<!-- Settings -->
 	<TESTS_RUN Condition="$(RUN_TESTS) == ''">false</TESTS_RUN>
@@ -25,6 +27,7 @@
     <SRC_PATH>$(ROOT_PATH)\src</SRC_PATH>
     <REPORTS_PATH>$(ROOT_PATH)\results</REPORTS_PATH>
 	<COVERAGE_PATH>$(REPORTS_PATH)\coverage</COVERAGE_PATH>
+	<ARTIFACTS_PATH>$(ROOT_PATH)\artifacts</ARTIFACTS_PATH>
 	<PACKAGES_PATH>$(SRC_PATH)\packages</PACKAGES_PATH>
 	<MSBUILD_EXTENSION_PATH>$(PACKAGES_PATH)\MSBuild.Extension.Pack.1.5.0\tools\net40</MSBUILD_EXTENSION_PATH>
 	<MSTEST_RUNNER_PATH>$(VS120COMNTOOLS)..\Ide\MSTest.exe</MSTEST_RUNNER_PATH>
@@ -45,6 +48,7 @@
   <ItemGroup>
     <PROJECT_FILES Include="**\*.csproj" />
 	<ASSEMBLY_INFO_FILES Include="**\AssemblyInfo.cs"/>
+
 	<TEST_PROJECTS Include="$(SRC_PATH)\demodeploy.Tests\demodeploy.Tests.csproj" />
 	<TEST_ASSEMBLIES Include="$(SRC_PATH)\**\bin\$(CONFIGURATION)\*.Tests.dll" />
 	<NUGET_CONFIGS Include="$(MSBuildStartupDirectory)\**\packages.config" />
@@ -61,7 +65,14 @@
   <Target Name="Compile" DependsOnTargets="LoadNuGetPackages;SetAssemblyVersion;ValidateStylecop">
     <Message Importance="high" Text="Compiling all projects: @(PROJECT_FILES)"/>
     <MSBuild Projects="@(PROJECT_FILES)"
-             Properties="Configuration=$(CONFIGURATION);Platform=$(PLATFORM)"
+             Properties="Configuration=$(CONFIGURATION);
+			   Platform=$(PLATFORM);
+			   MvcBuildViews=$(VALIDATE_VIEWS);
+			   DeployOnBuild=True;
+			   DeployTarget=WebPublish;
+			   WebPublishMethod=FileSystem;
+			   DeleteExistingFiles=True;
+			   publishUrl=$(ARTIFACTS_PATH)\$(CONFIGURATION)\$(MSBuildThisFileName)\"
              BuildInParallel="true" />    
   </Target>
   
@@ -98,7 +109,8 @@
     <Message Importance="high" Text="Cleaning reports"/>
     <RemoveDir Directories="$(REPORTS_PATH)" Condition="Exists('$(REPORTS_PATH)')" />
 	<RemoveDir Directories="$(SRC_PATH)\TestResults" Condition="Exists('$(SRC_PATH)\TestResults')" />
-    <MakeDir Directories = "$(REPORTS_PATH);$(COVERAGE_PATH)" />
+	<RemoveDir Directories="$(ARTIFACTS_PATH)" Condition="Exists('$(ARTIFACTS_PATH)')" />
+	<MakeDir Directories = "$(REPORTS_PATH);$(COVERAGE_PATH);$(ARTIFACTS_PATH)" />
   </Target>
 
   <!-- Clean packages files -->
@@ -157,5 +169,5 @@
     </StyleCopTask>
     <Message Importance="high" Text="Finished stylecop validation: $(STYLECOP_VIOLATION_COUNT) errors found."/>
   </Target>
-  
+ 
 </Project>
