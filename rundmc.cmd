@@ -13,3 +13,4 @@ if "%version%" == "" (
 call clean.cmd
 call build.cmd %configuration% %version%
 call test.cmd %configuration% %version%
+call deploy.cmd release %version%
