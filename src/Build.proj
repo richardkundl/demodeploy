@@ -71,11 +71,20 @@
              Properties="Configuration=$(CONFIGURATION);
 			   Platform=$(PLATFORM);
 			   MvcBuildViews=$(VALIDATE_VIEWS);
+			   DeployOnBuild=False;
+			   PublishProfile=$(CONFIGURATION)"
+             BuildInParallel="true" />    
+  </Target>
+  
+  <!-- Deploy -->
+  <Target Name="Deploy">
+    <Message Importance="high" Text="Deploying all projects: @(PROJECT_FILES)"/>
+    <MSBuild Projects="@(PROJECT_FILES)"
+             Properties="Configuration=$(CONFIGURATION);
+			   Platform=$(PLATFORM);
+			   MvcBuildViews=$(VALIDATE_VIEWS);
 			   DeployOnBuild=True;
-			   DeployTarget=WebPublish;
-			   WebPublishMethod=FileSystem;
-			   DeleteExistingFiles=True;
-			   publishUrl=$(ARTIFACTS_PATH)\$(CONFIGURATION)\$(MSBuildThisFileName)\"
+			   PublishProfile=$(CONFIGURATION)"
              BuildInParallel="true" />    
   </Target>
   
@@ -138,10 +147,9 @@
   <!-- Set version and assembly information -->
   <Target Name="SetAssemblyVersion">
     <!-- call current date time -->
-    <MSBuild.ExtensionPack.Framework.DateAndTime TaskAction="Get" Format="HHmm">
+	<MSBuild.ExtensionPack.Framework.DateAndTime TaskAction="GetElapsed" Start="2001-01-01" Format="Days">
       <Output TaskParameter="Result" PropertyName="ASSEMBLY_TIME_VERSION"/>
     </MSBuild.ExtensionPack.Framework.DateAndTime>
-	
 	<!-- generate the version number, it will be local variable, because the global variables can not be task to write  -->
     <PropertyGroup>
 	  <ASSEMBLY_VERSION>$(ASSEMBLY_MAYOR_VERSION).$(ASSEMBLY_MINOR_VERSION).$(ASSEMBLY_BUILD_NUMBER).$(ASSEMBLY_TIME_VERSION)</ASSEMBLY_VERSION>
