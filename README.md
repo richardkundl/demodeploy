@@ -13,7 +13,7 @@ demodeploy
 - [x] **Stylecop validation**
 - [ ] **Generate SlowCheetah transformation**
 - [ ] **Generate NuGet packages** and upload the remote server
-- [ ] **Deploy to filesystem**
+- [x] **Deploy to filesystem**
 - [ ] **Git control** and upload the new artifact to kudu
 
 **Optional**
